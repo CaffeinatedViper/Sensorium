@@ -1,5 +1,5 @@
-import React, { useState, useEffect,useRef,useCallback } from "react";
-import { motion, AnimatePresence,useAnimation } from "framer-motion";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import "../darkMode.css";
 
@@ -9,6 +9,7 @@ const TeamSection = () => {
   const [isMobile, setIsMobile] = useState(false);
   const controls = useAnimation();
   const textRef = useRef(null);
+  const imageContainerRef = useRef(null);
 
   const headingVariants = {
     hidden: { opacity: 0, x: -100 },
@@ -56,7 +57,6 @@ const TeamSection = () => {
   useEffect(() => {
     controls.start('visible');
   }, [controls]);
-
 
   useEffect(() => {
     const checkMobile = () => {
@@ -134,10 +134,40 @@ const TeamSection = () => {
     }),
   };
 
+  const handleMouseMove = (e) => {
+    if (imageContainerRef.current) {
+      const { left, top, width, height } = imageContainerRef.current.getBoundingClientRect();
+      const x = (e.clientX - left) / width - 0.5;
+      const y = (e.clientY - top) / height - 0.5;
+
+      const tiltX = y * 30; // Zwiększono do 30 stopni
+      const tiltY = -x * 30; // Zwiększono do 30 stopni
+      const scale = 1.05; // Dodano efekt powiększenia
+
+      imageContainerRef.current.style.transform = `
+        perspective(1000px) 
+        rotateX(${tiltX}deg) 
+        rotateY(${tiltY}deg)
+        scale(${scale})
+        translateZ(50px)
+      `;
+      imageContainerRef.current.style.boxShadow = `
+        ${-tiltY * 2}px ${-tiltX * 2}px 20px rgba(0,0,0,0.2)
+      `;
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (imageContainerRef.current) {
+      imageContainerRef.current.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1) translateZ(0)';
+      imageContainerRef.current.style.boxShadow = 'none';
+    }
+  };
+
   return (
     <section id="team" className="py-20 dark-mode">
       <div className="container mx-auto px-4">
-      <div className="text-center mb-40">
+        <div className="text-center mb-40">
           <motion.h2
             ref={textRef}
             className="font-heading text-7xl md:text-9xl mb-6 inline-block font-bold"
@@ -151,21 +181,25 @@ const TeamSection = () => {
           {/* Left side - Image */}
           {!isMobile && (
             <div
-              className="w-3/4 h-full md:w-1/2 relative overflow-hidden rounded-lg"
-              style={{ height: "450px" }} // Adjusted height
+              className="w-3/4 h-full md:w-1/2 relative overflow-visible rounded-lg"
+              style={{ height: "450px" }}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
             >
-              <div className="w-full h-full" style={{ perspective: "1000px" }}>
+              <div 
+                ref={imageContainerRef}
+                className="w-full h-full" 
+                style={{ 
+                  perspective: "1000px",
+                  transition: "all 0.3s ease-out",
+                  transformStyle: "preserve-3d"
+                }}
+              >
                 <AnimatePresence initial={false} custom={direction}>
                   <motion.img
                     key={selectedMember ? selectedMember.id : "placeholder"}
-                    src={
-                      selectedMember ? selectedMember.image : "/placeholder.png"
-                    }
-                    alt={
-                      selectedMember
-                        ? selectedMember.name
-                        : "Select a team member"
-                    }
+                    src={selectedMember ? selectedMember.image : "/placeholder.png"}
+                    alt={selectedMember ? selectedMember.name : "Select a team member"}
                     className="w-full h-full object-contain absolute top-0 left-0"
                     variants={waveVariants}
                     custom={direction}
@@ -173,8 +207,8 @@ const TeamSection = () => {
                     animate="center"
                     exit="exit"
                     style={{
-                      transformOrigin: "center center",
                       filter: "grayscale(100%)",
+                      backfaceVisibility: "hidden"
                     }}
                   />
                 </AnimatePresence>
@@ -221,39 +255,21 @@ const TeamSection = () => {
                         {isMobile && (
                           <div
                             className="w-full h-full md:w-1/2 relative overflow-hidden rounded-lg flex justify-center"
-                            style={{ height: "450px" }} // Adjusted height
+                            style={{ height: "450px" }}
                           >
                             <div
                               className="w-full h-full"
                               style={{ perspective: "1000px" }}
                             >
-                                <img
-                                  key={
-                                    selectedMember
-                                      ? selectedMember.id
-                                      : "placeholder"
-                                  }
-                                  src={
-                                    selectedMember
-                                      ? selectedMember.image
-                                      : "/placeholder.png"
-                                  }
-                                  alt={
-                                    selectedMember
-                                      ? selectedMember.name
-                                      : "Select a team member"
-                                  }
-                                  className="w-full h-full object-contain absolute top-0 left-0"
-                                  variants={waveVariants}
-                                  custom={direction}
-                                  initial="enter"
-                                  animate="center"
-                                  exit="exit"
-                                  style={{
-                                    transformOrigin: "center center",
-                                    filter: "grayscale(100%)",
-                                  }}
-                                />
+                              <img
+                                key={selectedMember ? selectedMember.id : "placeholder"}
+                                src={selectedMember ? selectedMember.image : "/placeholder.png"}
+                                alt={selectedMember ? selectedMember.name : "Select a team member"}
+                                className="w-full h-full object-contain absolute top-0 left-0"
+                                style={{
+                                  filter: "grayscale(100%)",
+                                }}
+                              />
                             </div>
                           </div>
                         )}
