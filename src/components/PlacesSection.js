@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, useAnimation, AnimatePresence } from 'framer-motion';
 
-// Główny komponent PlacesSection
 const PlacesSection = () => {
   const [expandedCard, setExpandedCard] = useState(null);
   const controls = useAnimation();
@@ -56,7 +55,6 @@ const PlacesSection = () => {
     controls.start('visible');
   }, [controls]);
 
-  // Zarządzanie przepełnieniem body
   useEffect(() => {
     if (expandedCard) {
       document.body.style.overflow = 'hidden';
@@ -83,7 +81,7 @@ const PlacesSection = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 relative">
-          {/* Pierwsza lokalizacja: Sensorium_artlab */}
+
           <LocationCard
             title="Sensorium_artlab"
             description="Galeria sztuki, w której prezentowane będą prace z nurtu art&science, dwóch pozornie różnych światów, które jednak doskonale współpracują, dając zaskakujące, nowatorskie projekty."
@@ -108,7 +106,6 @@ const PlacesSection = () => {
             }
           />
 
-          {/* Druga lokalizacja: Pałac sztuki w Krakowie */}
           <LocationCard
             title="Pałac sztuki w Krakowie"
             description="Pałac Sztuki w Krakowie jest siedzibą powstałego w 1854 r. Towarzystwa Przyjaciół Sztuk Pięknych."
@@ -142,7 +139,6 @@ const PlacesSection = () => {
   );
 };
 
-// Komponent LocationCard
 const LocationCard = ({
   title,
   description,
